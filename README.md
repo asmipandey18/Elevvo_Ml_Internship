@@ -2,7 +2,7 @@
 
 Machine learning tasks completed during my Machine Learning internship at Elevvo.
 
-**Tools:** Python, Pandas, NumPy, Matplotlib, Seaborn, Scikit-learn, imbalanced-learn
+**Tools:** Python, Pandas, NumPy, Matplotlib, Seaborn, Scikit-learn, imbalanced-learn, XGBoost, statsmodels
 
 ## Task 1: Student Score Prediction
 [Open the notebook](task1_student_score_prediction/Student_score_prediction.ipynb)
@@ -56,3 +56,30 @@ Machine learning tasks completed during my Machine Learning internship at Elevvo
 | Tree + SMOTE | 0.980 | 0.975 | 0.974 |
 
 **Key findings:** The Decision Tree performed best (cross-validated F1 of 0.979 vs 0.934 for Logistic Regression). CIBIL score was by far the most important feature. Class weights and SMOTE helped Logistic Regression's recall on rejected loans but made little difference to the tree.
+
+## Task 7: Sales Forecasting
+[Open the notebook](task7_sales_forecasting/Sales_forecasting.ipynb)
+
+**Goal:** Forecast weekly sales for 45 Walmart stores from historical sales data.
+
+**Dataset:** Walmart Dataset (Kaggle), 6,435 rows covering 143 weeks (Feb 2010 to Oct 2012).
+
+**What I did:**
+- Cleaned the data: checked for missing values, duplicates and negative sales (none found), converted the date, and sorted by store and date
+- Explored total sales over time, holiday vs normal weeks, sales by store, and correlations
+- Created time features (year, month, week, day), lag features (1, 2, 4 and 52 weeks) and a 4-week rolling average, all calculated within each store using only past values
+- Split the data by date (train up to June 2012, test June to October 2012) to avoid leaking the future
+- Trained Linear Regression and Random Forest, and compared them with a naive baseline (last week's sales)
+- Plotted actual vs predicted sales over time
+- Bonus: seasonal decomposition, and XGBoost with time-aware validation (TimeSeriesSplit)
+
+**Results (test set):**
+
+| Model | MAE | RMSE |
+|---|---|---|
+| Baseline (last week) | 52,681 | 80,073 |
+| Linear Regression | 50,200 | 73,027 |
+| Random Forest | 39,583 | 64,505 |
+| XGBoost | 41,083 | 65,032 |
+
+**Key findings:** Random Forest performed best, with an MAE of about 3.8% of average weekly sales, followed closely by XGBoost. Seasonal decomposition showed a strong yearly pattern with peaks around December and an almost flat long-term trend. Holiday_Flag does not mark the biggest pre-Christmas weeks, so month, week and lag_52 features matter more. The test period does not include the November and December peaks.
