@@ -83,3 +83,29 @@ Machine learning tasks completed during my Machine Learning internship at Elevvo
 | XGBoost | 41,083 | 65,032 |
 
 **Key findings:** Random Forest performed best, with an MAE of about 3.8% of average weekly sales, followed closely by XGBoost. Seasonal decomposition showed a strong yearly pattern with peaks around December and an almost flat long-term trend. Holiday_Flag does not mark the biggest pre-Christmas weeks, so month, week and lag_52 features matter more. The test period does not include the November and December peaks.
+
+## Task 9: Industrial Predictive Maintenance
+[Open the notebook](task9_predictive_maintenance/Predictive_maintenance.ipynb)
+
+**Goal:** Predict machine failures from sensor readings while keeping false alarms low, because a false alarm stops production for nothing. Models were judged by the False Discovery Rate (false alarms ÷ all alarms) alongside recall, not by accuracy.
+
+**Dataset:** AI4I 2020 Predictive Maintenance Dataset, 10,000 machine records. Only 3.4% are failures, so the data is severely imbalanced.
+
+**What I did:**
+- Cleaned the data, renamed columns, dropped ID columns, and excluded the failure-type columns from the features to avoid data leakage
+- Explored class imbalance, sensor readings for normal vs failed machines, failure rate by product quality, and correlations
+- Engineered features: temperature difference, power (torque × speed), and wear × torque
+- Split the data 80/20 with stratification, and tuned the decision threshold using cross-validation on the training set only
+- Compared Random Forest and XGBoost, including cost-sensitive (weighted) versions
+- Trained one model per failure type, and compared against an unsupervised Isolation Forest
+
+**Results (test set, 68 failures):**
+
+| Model | False alarms | Missed failures | FDR |
+|---|---|---|---|
+| Random Forest (tuned) | 2 | 13 | 0.035 |
+| XGBoost | 4 | 14 | 0.069 |
+| XGBoost (weighted) | 20 | 11 | 0.260 |
+| Isolation Forest (unsupervised) | 43 | 52 | 0.729 |
+
+**Key findings:** The tuned Random Forest had the lowest false alarm rate and caught 55 of 68 failures. Torque was the strongest single sensor, and the engineered features were more informative than the raw sensors. Power and Overstrain failures were predicted perfectly and Heat Dissipation well, but Tool Wear could not be detected without many false alarms. The test set is small (68 failures), so results are only a rough guide.
